@@ -20,8 +20,7 @@ It uses following:
 
 TODO:
 1. Add MainActivity test (espresso).
-2. Support time formatting (am/pm).
-3. Add layout for landscape mode to show more info for current weather.
-4. Add Dagger to test observables.
-5. Add SwipeRefreshLayout instead of ProgressBar and may be remove float button.
-6. Support release - add signing.
+2. Add layout for landscape mode to show more info for current weather.
+3. Add Dagger to test observables.
+4. Add SwipeRefreshLayout instead of ProgressBar and may be remove float button.
+5. Support release - add signing.
