@@ -1,10 +1,11 @@
 <resources>
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
-    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">10dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="appbar_padding_top">8dp</dimen>
-    <dimen name="attribution_text">12sp</dimen>
+    <dimen name="attribution_text">19sp</dimen>
+    <dimen name="attribution_text2">18sp</dimen>
     <dimen name="location_text">30sp</dimen>
     <dimen name="current_temperature_text">60sp</dimen>
 </resources>

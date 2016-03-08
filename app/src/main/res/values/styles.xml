@@ -11,8 +11,7 @@
     <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
-        <item name="android:colorForeground">@color/foreground_material_dark</item>
-        <item name="android:textColorPrimary">@color/foreground_material_dark</item>
+
     </style>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -31,6 +30,10 @@
         <item name="android:textColor">@color/text_faint</item>
     </style>
 
+    <style name="AttributionText2" parent="BaseText">
+        <item name="android:textSize">@dimen/attribution_text2</item>
+    </style>
+
     <style name="LocationText" parent="BaseText">
         <item name="android:textSize">@dimen/location_text</item>
         <item name="android:ellipsize">none</item>
@@ -39,6 +42,13 @@
     <style name="CurrentTemperatureText" parent="BaseText">
         <item name="android:textSize">@dimen/current_temperature_text</item>
         <item name="android:textColor">@color/brand_main</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">none</item>
+    </style>
+
+    <style name="EditBoxText" parent="BaseText">
+        <item name="android:textSize">@dimen/attribution_text2</item>
+        <item name="android:textColor">@color/text</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">none</item>
     </style>

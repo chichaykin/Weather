@@ -1,13 +1,9 @@
 package com.mich.weather.ui;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,123 +14,119 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationServices;
 import com.mich.weather.App;
 import com.mich.weather.R;
-import com.mich.weather.data.Coord;
-import com.mich.weather.data.WeatherLocation;
+import com.mich.weather.data.WeatherResponse;
 import com.mich.weather.repositories.WeatherLocationPojo;
 import com.mich.weather.utils.L;
+import com.mich.weather.utils.Utils;
 
-import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
+import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class MainActivity extends AppCompatActivity implements AddDialog.AddDialogListener {
+    private static final String CURRENT_CITY = "CurrentLocationName";
+    private static final String CURRENT_COUNTRY = "CurrentCountryName";
 
-    private static final String CURRENT_NAME = "NAME";
-    private static final long LOCATION_TIMEOUT_SECONDS = 20;
-    private View mProgressBar;
+    @Bind(R.id.spinner)
+    Spinner mSpinner;
+    @Bind(R.id.fab)
+    FloatingActionButton mFab;
     private CompositeSubscription mCompositeSubscription;
-    private SpinnerAdapter mAdapter;
-    private String mCurrentName;
-    private GoogleApiClient mGoogleApiClient;
-    private Location mLastLocation;
-    private Spinner mSpinner;
-    private WeatherLocation mWeatherData;
-
+    private SpinnerAdapter mSpinnerAdapter;
+    private WeatherResponse mCurrentWeatherData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
 
         mCompositeSubscription = new CompositeSubscription();
 
-        mProgressBar = findViewById(R.id.progress_container);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Setup spinner
-        mSpinner = (Spinner) findViewById(R.id.spinner);
-        mCurrentName = App.getInstance().getPreferences().getString(CURRENT_NAME, WeatherLocationPojo.CURRENT_LOCATION_NAME);
-        mAdapter = new SpinnerAdapter(toolbar.getContext(), new String[]{WeatherLocationPojo.CURRENT_LOCATION_NAME});
-        mSpinner.setAdapter(mAdapter);
+        mSpinnerAdapter = new SpinnerAdapter(toolbar.getContext());
+        mSpinner.setAdapter(mSpinnerAdapter);
 
         mSpinner.setOnItemSelectedListener(new SpinnerClickListener());
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        mFab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateData();
+                updateData(true);
             }
         });
 
-        LocationListener listener = new LocationListener();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(listener)
-                .addOnConnectionFailedListener(listener)
-                .build();
+        mCompositeSubscription.add(App.getInstance().getStoredLocations()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<WeatherLocationPojo>>() {
+                    @Override
+                    public void call(List<WeatherLocationPojo> list) {
+                        // init spinner
+                        mSpinnerAdapter.addAll(list);
+                        mSpinnerAdapter.notifyDataSetChanged();
 
-        updateData();
+                        // Restore current location
+                        String city = App.getInstance().getPreferences().getString(CURRENT_CITY, App.CURRENT_LOCATION_NAME);
+                        String country = App.getInstance().getPreferences().getString(CURRENT_COUNTRY, null);
+                        for (WeatherLocationPojo location : list) {
+                            if (location.city.equalsIgnoreCase(city)
+                                    && StringUtils.equalsIgnoreCase(location.country, country)) {
+                                int pos = mSpinnerAdapter.getPosition(location);
+                                mSpinner.setSelection(pos);
+                            }
+                        }
+                    }
+                }));
     }
 
-    protected void onStart() {
-        mGoogleApiClient.connect();
-        super.onStart();
-    }
 
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
-    }
+    private void updateData(boolean resetCachedLocation) {
+        showProgress(true);
 
-    private void updateData() {
-        mProgressBar.setVisibility(View.VISIBLE);
+        mCurrentWeatherData = null;
+        Observable<WeatherResponse> observable;
+        WeatherLocationPojo location = getCurrentLocation();
+        if (isCurrentLocation(location)) {
+            observable = App.getInstance().getCurrentLocationObservable(resetCachedLocation);
+        } else {
+            observable = App.getInstance().geCityObservable(location);
+        }
 
-        Observable<WeatherLocation> fetchDataObservable = App.getInstance().getLocations()
-                .filter(new Func1<WeatherLocationPojo, Boolean>() {
-                    @Override
-                    public Boolean call(WeatherLocationPojo pojo) {
-                        return pojo.Name.equals(mCurrentName);
-                    }
-                })
-                //.timeout(LOCATION_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-                .map(new Func1<WeatherLocationPojo, Coord>() {
-                    @Override
-                    public Coord call(WeatherLocationPojo pojo) {
-                        return App.getInstance().build(pojo, mLastLocation);
-                    }
-                })
-                .flatMap(new Func1<Coord, Observable<WeatherLocation>>() {
-                    @Override
-                    public Observable<WeatherLocation> call(Coord coordinates) {
-                        return App.getInstance().getWeatherService().getCurrentWeather(
-                                coordinates.getLon(), coordinates.getLat());
-                    }
-                });
-
-        mCompositeSubscription.add(fetchDataObservable
+        mCompositeSubscription.add(observable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new SubscriberImpl())
         );
     }
 
+    private WeatherLocationPojo getCurrentLocation() {
+        int pos = mSpinner.getSelectedItemPosition();
+        return mSpinnerAdapter.getItem(pos);
+    }
+
+    private boolean isCurrentLocation(WeatherLocationPojo location) {
+        return location != null && App.CURRENT_LOCATION_NAME.equals(location.city);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -160,6 +152,18 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
 
             case R.id.action_remove_location:
                 // remove current location
+                if (mCurrentWeatherData != null) {
+
+                    WeatherLocationPojo location = (WeatherLocationPojo) mSpinner.getSelectedItem();
+                    if (!isCurrentLocation(location)) {
+                        location.delete();
+                        mSpinnerAdapter.remove(location);
+                        mSpinnerAdapter.notifyDataSetChanged();
+                    } else {
+                        Snackbar.make(mFab, R.string.error_cannot_delete_current_location, Snackbar.LENGTH_LONG).show();
+                    }
+
+                }
                 return true;
 
             default:
@@ -171,13 +175,31 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
     }
 
     @Override
-    public void onDialogPositiveClick(DialogFragment dialog, String city, String country) {
-        dialog.dismiss();
-        showProgress(true);
+    public void onDialogPositiveClick(String city, String country) {
+
+        String name = String.format("%s,%s", city.trim(), country.trim());
+        WeatherLocationPojo location = new WeatherLocationPojo(city, country);
+        if (!Utils.isCityExist(city, country)) {
+            L.d("Adding new city %s", name);
+            // save new City
+
+            location.save();
+            mSpinnerAdapter.add(location);
+            mSpinnerAdapter.notifyDataSetChanged();
+        } else {
+            L.d("City '%s' is already existed", name);
+        }
+
+        int pos = mSpinnerAdapter.getPosition(location);
+        mSpinner.setSelection(pos);
+
+        updateData(false);
     }
 
     private void showProgress(boolean visible) {
-        mProgressBar.setVisibility(visible ? View.VISIBLE : View.GONE);
+        getSupportFragmentManager().beginTransaction().replace(
+                R.id.container, visible ? ProgressFragment.newInstance() : CurrentWeatherFragment.newInstance())
+                .commit();
     }
 
     @Override
@@ -186,8 +208,8 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
         mCompositeSubscription.unsubscribe();
     }
 
-    public WeatherLocation getCurrentWeatherData() {
-        return mWeatherData;
+    public WeatherResponse getCurrentWeatherData() {
+        return mCurrentWeatherData;
     }
 
     private class SpinnerClickListener implements OnItemSelectedListener {
@@ -195,77 +217,53 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             // When the given dropdown item is selected, show its contents in the
             // container view.
-            WeatherFragment fragment = WeatherFragment.newInstance();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.container, fragment).commit();
+
+            WeatherLocationPojo location = mSpinnerAdapter.getItem(position);
+            SharedPreferences.Editor edit = App.getInstance().getPreferences().edit();
+            edit.putString(CURRENT_CITY, location.city);
+            edit.putString(CURRENT_COUNTRY, location.country);
+            edit.apply();
+
+            if (mCurrentWeatherData == null ||
+                    !location.city.equalsIgnoreCase(mCurrentWeatherData.getCity().getName())) {
+                updateData(false);
+            } else {
+
+                getSupportFragmentManager().beginTransaction().replace(
+                        R.id.container, CurrentWeatherFragment.newInstance())
+                        .commit();
+            }
         }
 
         @Override
-        public void onNothingSelected(AdapterView<?> parent) {
-        }
+        public void onNothingSelected(AdapterView<?> parent) {}
     }
 
-    private class SubscriberImpl extends Subscriber<WeatherLocation> {
+    private class SubscriberImpl extends Subscriber<WeatherResponse> {
         @Override
-        public void onNext(final WeatherLocation weatherData) {
+        public void onNext(final WeatherResponse weatherData) {
             L.d("Weather: %s", weatherData.toString());
             // Update UI with current weather.
-            mWeatherData = weatherData;
-
-            List<String> list = new ArrayList<>();
-            for(WeatherLocationPojo p : App.getInstance().getLocationList()) {
-                list.add(p.Name);
+            if (weatherData.getCity() != null) {
+                mCurrentWeatherData = weatherData;
             }
-
-            mAdapter = new SpinnerAdapter(MainActivity.this, list.toArray(new String[list.size()]));
-            mSpinner.setAdapter(mAdapter);
+            showProgress(false);
         }
 
         @Override
-        public void onCompleted() {
-            mProgressBar.setVisibility(View.GONE);
-        }
+        public void onCompleted() {}
 
         @Override
         public void onError(final Throwable error) {
-            mProgressBar.setVisibility(View.GONE);
+            showProgress(false);
             error.printStackTrace();
             if (error instanceof TimeoutException) {
-                Snackbar.make(mProgressBar, R.string.error_location_unavailable, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(mFab, R.string.error_location_unavailable, Snackbar.LENGTH_LONG).show();
             } else {
                 L.e(error.getMessage());
                 error.printStackTrace();
-                throw new RuntimeException("See inner exception");
             }
         }
     }
 
-    private class LocationListener implements
-            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
-        @Override
-        public void onConnected(Bundle connectionHint) {
-            if (ActivityCompat.checkSelfPermission(App.sContext,
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                    && ActivityCompat.checkSelfPermission(App.sContext,
-                    Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
-            mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        }
-
-        @Override
-        public void onConnectionSuspended(int i) {
-        }
-
-        @Override
-        public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
-        }
-    }
 }

@@ -11,16 +11,20 @@ import android.widget.TextView;
 
 import com.mich.weather.repositories.WeatherLocationPojo;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
-import java.util.List;
 
 
-public class SpinnerAdapter extends ArrayAdapter<String> implements ThemedSpinnerAdapter {
+class SpinnerAdapter extends ArrayAdapter<WeatherLocationPojo> implements ThemedSpinnerAdapter {
+    private static final int LAYOUT = android.R.layout.simple_list_item_1;
     private final ThemedSpinnerAdapter.Helper mDropDownHelper;
+    private final LayoutInflater mInflater;
 
-    public SpinnerAdapter(Context context, String[] objects) {
-        super(context, android.R.layout.simple_list_item_1, objects);
+    public SpinnerAdapter(Context context) {
+        super(context, LAYOUT, new ArrayList<WeatherLocationPojo>());
         mDropDownHelper = new ThemedSpinnerAdapter.Helper(context);
+        mInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -30,13 +34,38 @@ public class SpinnerAdapter extends ArrayAdapter<String> implements ThemedSpinne
         if (convertView == null) {
             // Inflate the drop down using the helper's LayoutInflater
             LayoutInflater inflater = mDropDownHelper.getDropDownViewInflater();
-            view = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+            view = inflater.inflate(LAYOUT, parent, false);
         } else {
             view = convertView;
         }
 
+        WeatherLocationPojo location = getItem(position);
+        StringBuilder builder = new StringBuilder(location.city);
+        if (!StringUtils.isBlank(location.country)) {
+            builder.append(",\u0009").append(location.country);
+        }
         TextView textView = (TextView) view.findViewById(android.R.id.text1);
-        textView.setText(getItem(position));
+        textView.setText(builder.toString());
+
+        return view;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view;
+        if(convertView == null){
+            view = mInflater.inflate(LAYOUT, parent, false);
+        } else{
+            view = convertView;
+        }
+
+        WeatherLocationPojo location = getItem(position);
+        StringBuilder builder = new StringBuilder(location.city);
+        if (!StringUtils.isBlank(location.country)) {
+            builder.append(",\u0009").append(location.country);
+        }
+        TextView textView = (TextView) view.findViewById(android.R.id.text1);
+        textView.setText(builder.toString());
 
         return view;
     }
@@ -49,13 +78,5 @@ public class SpinnerAdapter extends ArrayAdapter<String> implements ThemedSpinne
     @Override
     public void setDropDownViewTheme(Resources.Theme theme) {
         mDropDownHelper.setDropDownViewTheme(theme);
-    }
-
-    public void addAll(List<WeatherLocationPojo> locationList) {
-        List<String> list = new ArrayList<>();
-        for(WeatherLocationPojo p : locationList) {
-            list.add(p.Name);
-        }
-        addAll(list);
     }
 }

@@ -10,6 +10,7 @@ public class L {
         Log.d(TAG, String.format(msg, args));
     }
 
+    @SuppressWarnings("unused")
     public static void e(Throwable t, String msg, Object... args) {
         Log.e(TAG, String.format(msg, args), t);
     }

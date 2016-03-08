@@ -6,7 +6,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-public class Coord {
+@SuppressWarnings("unused")
+public class Coordinates {
 
     private Double lon;
     private Double lat;
@@ -62,10 +63,10 @@ public class Coord {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Coord) == false) {
+        if (!(other instanceof Coordinates)) {
             return false;
         }
-        Coord rhs = ((Coord) other);
+        Coordinates rhs = ((Coordinates) other);
         return new EqualsBuilder().append(lon, rhs.lon).append(lat, rhs.lat).isEquals();
     }
 

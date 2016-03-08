@@ -6,16 +6,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.util.HashMap;
-import java.util.Map;
-
+@SuppressWarnings("unused")
 public class Weather {
 
     private Integer id;
     private String main;
     private String description;
     private String icon;
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
      * 
@@ -94,17 +91,9 @@ public class Weather {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
 
-    public Map<String, Object> getAdditionalProperties() {
-        return this.additionalProperties;
-    }
-
-    public void setAdditionalProperty(String name, Object value) {
-        this.additionalProperties.put(name, value);
-    }
-
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(id).append(main).append(description).append(icon).append(additionalProperties).toHashCode();
+        return new HashCodeBuilder().append(id).append(main).append(description).append(icon).toHashCode();
     }
 
     @Override
@@ -112,11 +101,11 @@ public class Weather {
         if (other == this) {
             return true;
         }
-        if ((other instanceof Weather) == false) {
+        if (!(other instanceof Weather)) {
             return false;
         }
         Weather rhs = ((Weather) other);
-        return new EqualsBuilder().append(id, rhs.id).append(main, rhs.main).append(description, rhs.description).append(icon, rhs.icon).append(additionalProperties, rhs.additionalProperties).isEquals();
+        return new EqualsBuilder().append(id, rhs.id).append(main, rhs.main).append(description, rhs.description).append(icon, rhs.icon).isEquals();
     }
 
 }

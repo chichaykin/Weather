@@ -1,4 +1,4 @@
-package com.mich.weather.services.api;
+package com.mich.weather.services.api.weather;
 
 
 import com.mich.weather.App;
@@ -38,6 +38,7 @@ public final class WeatherService {
         }
 
         File fileCache = new File(App.sContext.getCacheDir(), "weather");
+        //noinspection ResultOfMethodCallIgnored
         fileCache.mkdir();
         L.d("Cache: %s, exist %b", fileCache.getAbsolutePath(), fileCache.exists());
         Cache cache = new Cache(fileCache, CACHE_SIZE);
@@ -78,7 +79,6 @@ public final class WeatherService {
             Response originalResponse = chain.proceed(request);
             return originalResponse.newBuilder()
                     .header("Cache-Control", "public, max-age=86400")
-                            //String.format("max-age=%d, only-if-cached, max-stale=%d", 86400, 0))
                     .build();
         }
     };

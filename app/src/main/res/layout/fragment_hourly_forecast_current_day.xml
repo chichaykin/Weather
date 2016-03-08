@@ -1,0 +1,72 @@
+<!-- Container needed to force the footer to hug the bottom of the screen -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.mich.weather.ui.CurrentWeatherFragment">
+
+    <!-- Container enforces relative positioning of header and list of forecasts -->
+    <LinearLayout
+        android:id="@+id/weather_container_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="vertical">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/location_name"
+                style="@style/LocationText"
+                android:layout_width="0dp"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                tools:text="Moscow" />
+
+            <TextView
+                android:id="@+id/current_temperature"
+                style="@style/CurrentTemperatureText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginLeft="20dp"
+                tools:text="10C"
+                tools:ignore="RtlHardcoded" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/forecast_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/unknown_location_text"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:visibility="gone">
+
+        <TextView
+            style="@style/LocationText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/unknown_location_text" />
+    </LinearLayout>
+
+
+</RelativeLayout>
+
