@@ -24,7 +24,7 @@ import uk.co.ribot.easyadapter.annotations.ViewId;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @LayoutId(R.layout.hour_forecast)
-class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
+public class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
 
     @ViewId(R.id.week_text)
     TextView mDayOfWeek;

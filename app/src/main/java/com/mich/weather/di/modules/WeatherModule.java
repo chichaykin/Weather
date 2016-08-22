@@ -1,10 +1,12 @@
-package com.mich.weather.services.api.weather;
+package com.mich.weather.di.modules;
 
 
-import com.mich.weather.App;
+import android.content.Context;
+
 import com.mich.weather.BuildConfig;
-import com.mich.weather.utils.L;
+import com.mich.weather.services.api.weather.WeatherServiceApi;
 import com.mich.weather.utils.ConnectivityHelper;
+import com.mich.weather.utils.L;
 import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.Interceptor;
@@ -16,17 +18,27 @@ import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 import java.io.File;
 import java.io.IOException;
 
+import javax.inject.Singleton;
+
+import dagger.Module;
+import dagger.Provides;
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 import retrofit.RxJavaCallAdapterFactory;
 
-public final class WeatherService {
-    private static final String BASE_URL = "http://api.openweathermap.org";
-    private static final long CACHE_SIZE = 1024 * 1024 * 10;
+@Module
+public final class WeatherModule {
 
-    private WeatherService() {}
+    private final String mBaseUrl;
+    private final long mCashSize;
 
-    public static WeatherServiceApi apiService() {
+    private WeatherModule(String baseUrl, long cashSize) {
+        mBaseUrl = baseUrl;
+        mCashSize = cashSize;
+    }
+
+    @Provides @Singleton
+    public WeatherServiceApi provideWeatherApi(Context context) {
 
         final OkHttpClient client = new OkHttpClient();
         client.networkInterceptors().add(AUTHORIZE_INTERCEPTOR);
@@ -37,15 +49,15 @@ public final class WeatherService {
             client.interceptors().add(logging);
         }
 
-        File fileCache = new File(App.sContext.getCacheDir(), "weather");
+        File fileCache = new File(context.getCacheDir(), "weather");
         //noinspection ResultOfMethodCallIgnored
         fileCache.mkdir();
         L.d("Cache: %s, exist %b", fileCache.getAbsolutePath(), fileCache.exists());
-        Cache cache = new Cache(fileCache, CACHE_SIZE);
+        Cache cache = new Cache(fileCache, mCashSize);
         client.setCache(cache);
 
         return new Retrofit.Builder().client(client)
-                .baseUrl(BASE_URL)
+                .baseUrl(mBaseUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build().create(WeatherServiceApi.class);

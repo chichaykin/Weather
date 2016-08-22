@@ -43,7 +43,11 @@ dependencies {
     apt "com.github.Raizlabs.DBFlow:dbflow-processor:${DB_FLOW_VER}"
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${DB_FLOW_VER}"
     compile "com.github.Raizlabs.DBFlow:dbflow:${DB_FLOW_VER}"
-    compile 'javax.annotation:jsr250-api:1.0'
+    //compile 'javax.annotation:jsr250-api:1.0'
+
+    apt 'com.google.dagger:dagger-compiler:2.5'
+    compile 'com.google.dagger:dagger:2.5'
+    provided 'javax.annotation:jsr250-api:1.0'
 
     compile 'com.google.code.gson:gson:2.4'
     compile "com.squareup.retrofit:retrofit:${RETROFIT_VER}"

@@ -26,18 +26,22 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.concurrent.TimeoutException;
 
+import javax.inject.Inject;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 
 
 @SuppressWarnings({"WeakerAccess", "unused"})
-public class MainActivity extends AppCompatActivity implements AddDialog.AddDialogListener {
+public class MainActivity extends BaseActivity implements AddDialog.AddDialogListener {
+    public static String CURRENT_LOCATION_NAME;
     private static final String CURRENT_CITY = "CurrentLocationName";
     private static final String CURRENT_COUNTRY = "CurrentCountryName";
 
@@ -45,6 +49,12 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
     Spinner mSpinner;
     @Bind(R.id.fab)
     FloatingActionButton mFab;
+
+    @Inject
+    Observable<List<WeatherLocationPojo>> mStoredLocations;
+    @Inject
+    SharedPreferences mPreferences;
+
     private CompositeSubscription mCompositeSubscription;
     private SpinnerAdapter mSpinnerAdapter;
     private WeatherResponse mCurrentWeatherData;
@@ -54,6 +64,8 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        activityComponent().inject(this);
 
         mCompositeSubscription = new CompositeSubscription();
 
@@ -75,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
             }
         });
 
-        mCompositeSubscription.add(App.getInstance().getStoredLocations()
+        mCompositeSubscription.add(mStoredLocations
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Action1<List<WeatherLocationPojo>>() {
@@ -86,8 +98,8 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
                         mSpinnerAdapter.notifyDataSetChanged();
 
                         // Restore current location
-                        String city = App.getInstance().getPreferences().getString(CURRENT_CITY, App.CURRENT_LOCATION_NAME);
-                        String country = App.getInstance().getPreferences().getString(CURRENT_COUNTRY, null);
+                        String city = mPreferences.getString(CURRENT_CITY, CURRENT_LOCATION_NAME);
+                        String country = mPreferences.getString(CURRENT_COUNTRY, null);
                         for (WeatherLocationPojo location : list) {
                             if (location.city.equalsIgnoreCase(city)
                                     && StringUtils.equalsIgnoreCase(location.country, country)) {
@@ -115,6 +127,12 @@ public class MainActivity extends AppCompatActivity implements AddDialog.AddDial
         mCompositeSubscription.add(observable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
+                .map(new Func1<WeatherResponse, WeatherResponse>() {
+                    @Override
+                    public WeatherResponse call(WeatherResponse input) {
+                        return input;
+                    }
+                })
                 .subscribe(new SubscriberImpl())
         );
     }

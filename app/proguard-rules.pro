@@ -20,3 +20,7 @@
 -keep class retrofit2.** { *; }
 -keepattributes Signature
 -keepattributes Exceptions
+-keepattributes *Annotation*
+-keepclassmembers class * extends uk.co.ribot.easyadapter.ItemViewHolder {
+    public <init>(...);
+ }
