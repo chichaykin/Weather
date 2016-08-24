@@ -31,13 +31,16 @@ public final class WeatherModule {
 
     private final String mBaseUrl;
     private final long mCashSize;
+    private final ConnectivityHelper mHelper;
 
-    private WeatherModule(String baseUrl, long cashSize) {
+    public WeatherModule(String baseUrl, long cashSize, Context context) {
         mBaseUrl = baseUrl;
         mCashSize = cashSize;
+        mHelper = new ConnectivityHelper(context);
     }
 
-    @Provides @Singleton
+    @Provides
+    @Singleton
     public WeatherServiceApi provideWeatherApi(Context context) {
 
         final OkHttpClient client = new OkHttpClient();
@@ -75,13 +78,13 @@ public final class WeatherModule {
         }
     };
 
-    private static final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
+    private final Interceptor REWRITE_CACHE_CONTROL_INTERCEPTOR = new Interceptor() {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request request = chain.request();
             // Add Cache Control only for GET methods
             if (request.method().equals("GET")) {
-                if (!ConnectivityHelper.isNetworkAvailable()) {
+                if (!mHelper.isNetworkAvailable()) {
                     // 4 weeks stale
                     request = request.newBuilder()
                             .header("Cache-Control", "public, max-stale=2419200")

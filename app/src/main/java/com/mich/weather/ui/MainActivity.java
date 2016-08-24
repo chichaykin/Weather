@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,10 +13,11 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 
-import com.mich.weather.App;
 import com.mich.weather.R;
 import com.mich.weather.data.WeatherResponse;
 import com.mich.weather.repositories.WeatherLocationPojo;
+import com.mich.weather.services.api.location.LocationService;
+import com.mich.weather.services.api.weather.WeatherServiceApi;
 import com.mich.weather.utils.L;
 import com.mich.weather.utils.Utils;
 
@@ -30,6 +30,7 @@ import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import dagger.Lazy;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
@@ -44,6 +45,9 @@ public class MainActivity extends BaseActivity implements AddDialog.AddDialogLis
     public static String CURRENT_LOCATION_NAME;
     private static final String CURRENT_CITY = "CurrentLocationName";
     private static final String CURRENT_COUNTRY = "CurrentCountryName";
+    private CompositeSubscription mCompositeSubscription;
+    private SpinnerAdapter mSpinnerAdapter;
+    private WeatherResponse mCurrentWeatherData;
 
     @Bind(R.id.spinner)
     Spinner mSpinner;
@@ -55,9 +59,12 @@ public class MainActivity extends BaseActivity implements AddDialog.AddDialogLis
     @Inject
     SharedPreferences mPreferences;
 
-    private CompositeSubscription mCompositeSubscription;
-    private SpinnerAdapter mSpinnerAdapter;
-    private WeatherResponse mCurrentWeatherData;
+    @Inject
+    Lazy<LocationService> mLocationService;
+    @Inject
+    Lazy<WeatherServiceApi> mWeatherService;
+    @Inject
+    String mHomeLocationName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,9 +126,9 @@ public class MainActivity extends BaseActivity implements AddDialog.AddDialogLis
         Observable<WeatherResponse> observable;
         WeatherLocationPojo location = getCurrentLocation();
         if (isCurrentLocation(location)) {
-            observable = App.getInstance().getCurrentLocationObservable(resetCachedLocation);
+            observable = Utils.getCurrentLocationObservable(resetCachedLocation, mLocationService.get(), mWeatherService.get());
         } else {
-            observable = App.getInstance().geCityObservable(location);
+            observable = Utils.geCityObservable(location, mWeatherService.get());
         }
 
         mCompositeSubscription.add(observable
@@ -143,7 +150,7 @@ public class MainActivity extends BaseActivity implements AddDialog.AddDialogLis
     }
 
     private boolean isCurrentLocation(WeatherLocationPojo location) {
-        return location != null && App.CURRENT_LOCATION_NAME.equals(location.city);
+        return location != null && mHomeLocationName.equals(location.city);
     }
 
     @Override
@@ -237,7 +244,7 @@ public class MainActivity extends BaseActivity implements AddDialog.AddDialogLis
             // container view.
 
             WeatherLocationPojo location = mSpinnerAdapter.getItem(position);
-            SharedPreferences.Editor edit = App.getInstance().getPreferences().edit();
+            SharedPreferences.Editor edit = mPreferences.edit();
             edit.putString(CURRENT_CITY, location.city);
             edit.putString(CURRENT_COUNTRY, location.country);
             edit.apply();

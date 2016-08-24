@@ -4,6 +4,7 @@ import android.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 
+import com.mich.weather.App;
 import com.mich.weather.di.components.ActivityComponent;
 import com.mich.weather.di.components.DaggerActivityComponent;
 import com.mich.weather.di.modules.ActivityModule;
@@ -17,7 +18,7 @@ public class BaseActivity extends AppCompatActivity {
         if (mActivityComponent == null) {
             mActivityComponent = DaggerActivityComponent.builder()
                     .activityModule(new ActivityModule(this))
-                    //.applicationComponent(AndroidBoilerplateApplication.get(this).getComponent())
+                    .appComponent(App.get(this).getComponent())
                     .build();
         }
         return mActivityComponent;
