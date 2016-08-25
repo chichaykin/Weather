@@ -7,6 +7,7 @@ import com.mich.weather.di.components.AppComponent;
 import com.mich.weather.di.components.DaggerAppComponent;
 import com.mich.weather.di.modules.AppModule;
 import com.mich.weather.di.modules.WeatherModule;
+import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 
 public class App extends Application {
@@ -19,7 +20,7 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        FlowManager.init(this);
+        FlowManager.init(new FlowConfig.Builder(this).build());
 
         mAppComponent = DaggerAppComponent.builder()
                 .appModule(new AppModule(this))

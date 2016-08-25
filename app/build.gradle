@@ -4,14 +4,14 @@ apply plugin: 'com.neenbedankt.android-apt'
 android {
     useLibrary 'org.apache.http.legacy'
 
-    compileSdkVersion 23
+    compileSdkVersion 24
     buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.mich.weather"
         minSdkVersion 14
         //noinspection OldTargetApi
-        targetSdkVersion 22
+        targetSdkVersion 24
         versionCode 1
         versionName "1.0"
     }
@@ -26,10 +26,10 @@ android {
 
 
 dependencies {
-    final DB_FLOW_VER = '3.0.0-beta3'
+    final DB_FLOW_VER = '3.1.1'
     final RETROFIT_VER = '2.1.0'
     final OKHTTP_VER = '3.4.1'
-    final ANDROID_SUPPORT = '23.1.1'
+    final ANDROID_SUPPORT = '24.2.0'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
