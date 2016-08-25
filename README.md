@@ -19,8 +19,8 @@ It uses following:
 * Robolectric for quick testing.
 
 TODO:
-1. Add MainActivity test (espresso).
-2. Add layout for landscape mode to show more info for current weather.
-3. Add Dagger to test observables.
-4. Add SwipeRefreshLayout instead of ProgressBar and may be remove float button.
-5. Support release - add signing.
+* Add MainActivity test (espresso).
+* Add layout for landscape mode to show more info for current weather.
+* Add support Fahrenheit
+* Add settings for temperature and pressure unit of measures
+* Support release - add signing.
