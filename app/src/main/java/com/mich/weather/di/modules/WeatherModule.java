@@ -4,16 +4,10 @@ package com.mich.weather.di.modules;
 import android.content.Context;
 
 import com.mich.weather.BuildConfig;
+import com.mich.weather.di.scopes.ApplicationContext;
 import com.mich.weather.services.api.weather.WeatherServiceApi;
 import com.mich.weather.utils.ConnectivityHelper;
 import com.mich.weather.utils.L;
-import com.squareup.okhttp.Cache;
-import com.squareup.okhttp.HttpUrl;
-import com.squareup.okhttp.Interceptor;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.logging.HttpLoggingInterceptor;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,44 +16,57 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import retrofit.GsonConverterFactory;
-import retrofit.Retrofit;
-import retrofit.RxJavaCallAdapterFactory;
+import okhttp3.Cache;
+import okhttp3.HttpUrl;
+import okhttp3.Interceptor;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 @Module
 public final class WeatherModule {
-
     private final String mBaseUrl;
+    private final String mAppKey;
     private final long mCashSize;
+    private final Context mContext;
     private final ConnectivityHelper mHelper;
 
-    public WeatherModule(String baseUrl, long cashSize, Context context) {
+    @SuppressWarnings("SameParameterValue")
+    public WeatherModule(String baseUrl, String appKey, long cashSize,
+                         @ApplicationContext Context context) {
         mBaseUrl = baseUrl;
+        mAppKey = appKey;
         mCashSize = cashSize;
+        mContext = context;
         mHelper = new ConnectivityHelper(context);
     }
 
+    @SuppressWarnings("unused")
     @Provides
     @Singleton
-    public WeatherServiceApi provideWeatherApi(Context context) {
+    public WeatherServiceApi providesWeatherApi() {
 
-        final OkHttpClient client = new OkHttpClient();
-        client.networkInterceptors().add(AUTHORIZE_INTERCEPTOR);
-        client.networkInterceptors().add(REWRITE_CACHE_CONTROL_INTERCEPTOR);
+        OkHttpClient.Builder clientBuilder = new OkHttpClient.Builder()
+                .addInterceptor(AUTHORIZE_INTERCEPTOR)
+                .addInterceptor(REWRITE_CACHE_CONTROL_INTERCEPTOR);
         if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
             logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-            client.interceptors().add(logging);
+            clientBuilder.interceptors().add(logging);
         }
 
-        File fileCache = new File(context.getCacheDir(), "weather");
+        File fileCache = new File(mContext.getCacheDir(), "weather");
         //noinspection ResultOfMethodCallIgnored
         fileCache.mkdir();
         L.d("Cache: %s, exist %b", fileCache.getAbsolutePath(), fileCache.exists());
         Cache cache = new Cache(fileCache, mCashSize);
-        client.setCache(cache);
+        clientBuilder.cache(cache);
 
-        return new Retrofit.Builder().client(client)
+        return new Retrofit.Builder().client(clientBuilder.build())
                 .baseUrl(mBaseUrl)
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
@@ -67,12 +74,12 @@ public final class WeatherModule {
 
     }
 
-    private static final Interceptor AUTHORIZE_INTERCEPTOR = new Interceptor() {
+    private final Interceptor AUTHORIZE_INTERCEPTOR = new Interceptor() {
         @Override
         public Response intercept(Chain chain) throws IOException {
             Request request = chain.request();
 
-            HttpUrl url = request.httpUrl().newBuilder().addQueryParameter("appid","f5a59b6b24b40224fd8d6a69f74f6c98").build();
+            HttpUrl url = request.url().newBuilder().addQueryParameter("appid", mAppKey).build();
             request = request.newBuilder().url(url).build();
             return chain.proceed(request);
         }

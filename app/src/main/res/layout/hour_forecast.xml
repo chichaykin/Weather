@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardBackgroundColor="@color/gray"
     card_view:cardCornerRadius="4dp"
     card_view:cardUseCompatPadding="true"
     tools:ignore="ContentDescription">
@@ -27,11 +26,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/week_text"
-            android:layout_weight="1"
             android:gravity="center_vertical"
+            android:minWidth="125dp"
             android:orientation="horizontal"
-            android:weightSum="3"
-            tools:ignore="UseCompoundDrawables">
+            android:weightSum="3">
 
             <TextView
                 android:id="@+id/time"
@@ -39,7 +37,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="2"
-                android:gravity="left"
+                android:gravity="start"
                 tools:text="06:00" />
 
             <ImageView
@@ -47,7 +45,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:gravity="center_horizontal"
+                android:gravity="center"
                 tools:ignore="RtlHardcoded"
                 tools:src="@drawable/sun" />
 
@@ -60,6 +58,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/left_part"
             android:layout_toRightOf="@id/left_part"
             android:textStyle="bold"
             tools:text="35°C" />
@@ -71,8 +71,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@id/temperature"
+            android:lines="1"
             android:textStyle="italic"
-            tools:text="Clear sky"
+            tools:text="Scattered clouds very dangerous"
             tools:visibility="visible" />
 
 
@@ -83,6 +84,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/temperature"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/left_part"
             android:layout_toRightOf="@id/left_part"
             tools:text="-7.7 -7.7°C, 2.91m/s. 0%, 1015.94 hpa"
             tools:visibility="visible" />

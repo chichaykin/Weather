@@ -10,11 +10,11 @@ import com.mich.weather.di.components.DaggerActivityComponent;
 import com.mich.weather.di.modules.ActivityModule;
 
 
-public class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity {
 
     private ActivityComponent mActivityComponent;
 
-    public ActivityComponent activityComponent() {
+    ActivityComponent activityComponent() {
         if (mActivityComponent == null) {
             mActivityComponent = DaggerActivityComponent.builder()
                     .activityModule(new ActivityModule(this))

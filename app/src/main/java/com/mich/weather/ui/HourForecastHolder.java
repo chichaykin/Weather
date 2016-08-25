@@ -70,7 +70,7 @@ public class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
         Main main = item.getMain();
         mTemperature.setText(Utils.formatTemperature(main.getTemperature()));
 
-        mMoreInfo.setText(String.format("%s/%s, %s m/s, %s %%, %s hpa",
+        mMoreInfo.setText(String.format("%s/%s, %s m/s, %s%%, %s hpa",
                 Utils.formatTemperature(main.getTempMin()),
                 Utils.formatTemperature(main.getTempMax()),
                 item.getWind().getSpeed(),
