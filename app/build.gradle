@@ -5,7 +5,7 @@ android {
     useLibrary 'org.apache.http.legacy'
 
     compileSdkVersion 23
-    buildToolsVersion "23.0.2"
+    buildToolsVersion "23.0.3"
 
     defaultConfig {
         applicationId "com.mich.weather"
@@ -27,8 +27,8 @@ android {
 
 dependencies {
     final DB_FLOW_VER = '3.0.0-beta3'
-    final RETROFIT_VER = '2.0.0-beta2'
-    final OKHTTP_VER = '2.6.0'
+    final RETROFIT_VER = '2.1.0'
+    final OKHTTP_VER = '3.4.1'
     final ANDROID_SUPPORT = '23.1.1'
 
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -43,14 +43,18 @@ dependencies {
     apt "com.github.Raizlabs.DBFlow:dbflow-processor:${DB_FLOW_VER}"
     compile "com.github.Raizlabs.DBFlow:dbflow-core:${DB_FLOW_VER}"
     compile "com.github.Raizlabs.DBFlow:dbflow:${DB_FLOW_VER}"
-    compile 'javax.annotation:jsr250-api:1.0'
+    //compile 'javax.annotation:jsr250-api:1.0'
+
+    apt 'com.google.dagger:dagger-compiler:2.5'
+    compile 'com.google.dagger:dagger:2.5'
+    provided 'javax.annotation:jsr250-api:1.0'
 
     compile 'com.google.code.gson:gson:2.4'
-    compile "com.squareup.retrofit:retrofit:${RETROFIT_VER}"
-    compile "com.squareup.retrofit:converter-gson:${RETROFIT_VER}"
-    compile "com.squareup.retrofit:adapter-rxjava:${RETROFIT_VER}"
-    compile "com.squareup.okhttp:okhttp:${OKHTTP_VER}"
-    compile "com.squareup.okhttp:logging-interceptor:${OKHTTP_VER}"
+    compile "com.squareup.retrofit2:retrofit:${RETROFIT_VER}"
+    compile "com.squareup.retrofit2:converter-gson:${RETROFIT_VER}"
+    compile "com.squareup.retrofit2:adapter-rxjava:${RETROFIT_VER}"
+    compile "com.squareup.okhttp3:okhttp:${OKHTTP_VER}"
+    compile "com.squareup.okhttp3:logging-interceptor:${OKHTTP_VER}"
     compile 'org.apache.commons:commons-lang3:3.3.2'
 
     compile 'io.reactivex:rxandroid:1.1.0'

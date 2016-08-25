@@ -13,5 +13,5 @@
     <string name="action_add_location">Add location name</string>
     <string name="Current">Current Location</string>
     <string name="error_cannot_delete_current_location">Cannot delete current location</string>
-    <string name="unknown_location_text">Location is unknown!</string>
+    <string name="unknown_location_text">No Internet or unknown location</string>
 </resources>

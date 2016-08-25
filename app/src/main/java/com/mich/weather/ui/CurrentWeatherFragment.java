@@ -30,7 +30,7 @@ public class CurrentWeatherFragment extends Fragment {
     RecyclerView mRecyclerView;
     @Bind(R.id.unknown_location_text)
     View mUnknownLocationText;
-    @Bind(R.id.weather_container_view)
+    @Bind(R.id.weather_header)
     View mWeatherContainerView;
 
     /**
@@ -46,9 +46,8 @@ public class CurrentWeatherFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_hourly_forecast_current_day, container, false);
         ButterKnife.bind(this, rootView);
         WeatherResponse data = getMainActivity().getCurrentWeatherData();
-        if (data != null) {
-            mWeatherContainerView.setVisibility(View.VISIBLE);
-            mUnknownLocationText.setVisibility(View.GONE);
+        boolean isValidData = data != null;
+        if (isValidData) {
             mLocationNameTextView.setText(String.format("%s, %s", data.getCity().getName(), data.getCity().getCountry()));
             WeatherForecast now = DayFormatter.getCurrentForecast(data.getForecast());
             mCurrentTemperatureTextView.setText(Utils.formatTemperature(now.getMain().getTemperature()));
@@ -57,10 +56,12 @@ public class CurrentWeatherFragment extends Fragment {
             EasyRecyclerAdapter<WeatherForecast> adapter = new EasyRecyclerAdapter<>(this.getContext(), HourForecastHolder.class);
             mRecyclerView.setAdapter(adapter);
             adapter.addItems(data.getForecast());
-        } else {
-            mWeatherContainerView.setVisibility(View.GONE);
-            mUnknownLocationText.setVisibility(View.VISIBLE);
         }
+
+        int visible = isValidData ? View.VISIBLE : View.GONE;
+        mWeatherContainerView.setVisibility(visible);
+        mRecyclerView.setVisibility(visible);
+        mUnknownLocationText.setVisibility(isValidData ? View.GONE : View.VISIBLE);
         return rootView;
     }
 

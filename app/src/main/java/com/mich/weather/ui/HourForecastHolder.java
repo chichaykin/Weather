@@ -24,7 +24,7 @@ import uk.co.ribot.easyadapter.annotations.ViewId;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @LayoutId(R.layout.hour_forecast)
-class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
+public class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
 
     @ViewId(R.id.week_text)
     TextView mDayOfWeek;
@@ -70,7 +70,7 @@ class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
         Main main = item.getMain();
         mTemperature.setText(Utils.formatTemperature(main.getTemperature()));
 
-        mMoreInfo.setText(String.format("%s/%s, %s m/s, %s %%, %s hpa",
+        mMoreInfo.setText(String.format("%s/%s, %s m/s, %s%%, %s hpa",
                 Utils.formatTemperature(main.getTempMin()),
                 Utils.formatTemperature(main.getTempMax()),
                 item.getWind().getSpeed(),

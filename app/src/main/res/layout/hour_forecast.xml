@@ -1,114 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="10dp"
-    android:orientation="horizontal"
+    card_view:cardCornerRadius="4dp"
+    card_view:cardUseCompatPadding="true"
     tools:ignore="ContentDescription">
 
-    <android.support.v7.widget.CardView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        card_view:cardCornerRadius="4dp">
+        android:padding="5dp">
+
+        <TextView
+            android:id="@+id/week_text"
+            style="@style/AttributionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="Today" />
+
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/left_part"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="1dp">
+            android:layout_below="@id/week_text"
+            android:gravity="center_vertical"
+            android:minWidth="125dp"
+            android:orientation="horizontal"
+            android:weightSum="3">
 
             <TextView
-                android:id="@+id/week_text"
-                style="@style/AttributionText"
-                android:layout_width="wrap_content"
+                android:id="@+id/time"
+                style="@style/AttributionText2"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                tools:text="Today" />
+                android:layout_weight="2"
+                android:gravity="start"
+                tools:text="06:00" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal"
-                    tools:ignore="UseCompoundDrawables">
-
-                    <TextView
-                        android:id="@+id/time"
-                        style="@style/AttributionText2"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:gravity="center"
-                        tools:text="06:00" />
-
-                    <ImageView
-                        android:id="@+id/weather_icon"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="20dp"
-                        android:gravity="left"
-                        tools:src="@drawable/sun"
-                        tools:ignore="RtlHardcoded" />
-
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_marginLeft="40dp"
-                    android:orientation="vertical"
-                    tools:ignore="RtlHardcoded">
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:id="@+id/temperature"
-                            style="@style/AttributionText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:textStyle="bold"
-                            tools:text="35°C" />
-
-                        <TextView
-                            android:id="@+id/description"
-                            style="@style/AttributionText2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginLeft="20dp"
-                            android:textStyle="italic"
-
-                            tools:text="Clear sky" />
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content">
-
-                        <TextView
-                            android:id="@+id/more_info"
-                            style="@style/AttributionText2"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            tools:text="-7.7 -7.7°C, 2.91m/s. 0%, 1015.94 hpa" />
-                    </LinearLayout>
-
-
-                </LinearLayout>
-
-
-            </LinearLayout>
+            <ImageView
+                android:id="@+id/weather_icon"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                tools:ignore="RtlHardcoded"
+                tools:src="@drawable/sun" />
 
         </LinearLayout>
 
-    </android.support.v7.widget.CardView>
+
+        <TextView
+            android:id="@+id/temperature"
+            style="@style/AttributionText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/left_part"
+            android:layout_toRightOf="@id/left_part"
+            android:textStyle="bold"
+            tools:text="35°C" />
+
+        <TextView
+            android:id="@+id/description"
+            style="@style/AttributionText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_toRightOf="@id/temperature"
+            android:lines="1"
+            android:textStyle="italic"
+            tools:text="Scattered clouds very dangerous"
+            tools:visibility="visible" />
 
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/more_info"
+            style="@style/AttributionText2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/temperature"
+            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/left_part"
+            android:layout_toRightOf="@id/left_part"
+            tools:text="-7.7 -7.7°C, 2.91m/s. 0%, 1015.94 hpa"
+            tools:visibility="visible" />
+
+
+    </RelativeLayout>
+
+
+</android.support.v7.widget.CardView>
