@@ -1,5 +1,6 @@
 package com.mich.weather.ui;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.View;
@@ -51,18 +52,20 @@ public class HourForecastHolder extends ItemViewHolder<WeatherForecast> {
     @Override
     public void onSetValues(WeatherForecast item, PositionInfo positionInfo) {
         L.d("Time %s", item.getTime());
+        Context context = getContext();
         long timeStamp = item.getTimestamp();
-        DayFormatter formatter = new DayFormatter(this.getContext());
+        DayFormatter formatter = new DayFormatter(context);
         mDayOfWeek.setText(formatter.format(timeStamp));
         mTime.setText(formatter.formatTime(timeStamp));
         List<Weather> list = item.getWeathers();
         if (list != null && !list.isEmpty()) {
             Weather weather = list.get(0);
-            Resources r = getContext().getResources();
+            Resources r = context.getResources();
             int size = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 50, r.getDisplayMetrics());
-            Picasso.with(getContext())
+            Picasso.with(context)
                     .load(Utils.getUrl(weather.getIcon()))
                     .resize(size, size)
+                    .tag(context)
                     .into(mImageView);
             mDescription.setText(weather.getDescription());
         }
