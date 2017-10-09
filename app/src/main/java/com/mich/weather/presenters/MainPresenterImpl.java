@@ -154,12 +154,6 @@ public class MainPresenterImpl implements MainPresenter {
         mCompositeSubscription.add(observable
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
-                .map(new Func1<WeatherResponse, WeatherResponse>() {
-                    @Override
-                    public WeatherResponse call(WeatherResponse input) {
-                        return input;
-                    }
-                })
                 .subscribe(new SubscriberImpl())
         );
     }
