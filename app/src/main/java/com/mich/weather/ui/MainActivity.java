@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.Spinner;
 
+import butterknife.BindView;
 import com.mich.weather.R;
 import com.mich.weather.data.WeatherResponse;
 import com.mich.weather.presenters.MainPresenter;
@@ -23,7 +24,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
 
 
@@ -31,9 +31,9 @@ import butterknife.ButterKnife;
 public class MainActivity extends BaseActivity implements AddDialog.AddDialogListener, MainView {
     private SpinnerAdapter mSpinnerAdapter;
 
-    @Bind(R.id.spinner)
+    @BindView(R.id.spinner)
     Spinner mSpinner;
-    @Bind(R.id.swipe_refresh_layout)
+    @BindView(R.id.swipe_refresh_layout)
     SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Inject

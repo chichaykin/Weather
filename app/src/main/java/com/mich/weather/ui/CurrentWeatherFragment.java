@@ -8,29 +8,27 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
 import com.mich.weather.R;
 import com.mich.weather.data.WeatherForecast;
 import com.mich.weather.data.WeatherResponse;
 import com.mich.weather.utils.DayFormatter;
 import com.mich.weather.utils.Utils;
-
-import butterknife.Bind;
-import butterknife.ButterKnife;
 import uk.co.ribot.easyadapter.EasyRecyclerAdapter;
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 public class CurrentWeatherFragment extends Fragment {
     @SuppressWarnings("unused")
-    @Bind(R.id.location_name)
+    @BindView(R.id.location_name)
     TextView mLocationNameTextView;
-    @Bind(R.id.current_temperature)
+    @BindView(R.id.current_temperature)
     TextView mCurrentTemperatureTextView;
-    @Bind(R.id.forecast_list)
+    @BindView(R.id.forecast_list)
     RecyclerView mRecyclerView;
-    @Bind(R.id.unknown_location_text)
+    @BindView(R.id.unknown_location_text)
     View mUnknownLocationText;
-    @Bind(R.id.weather_header)
+    @BindView(R.id.weather_header)
     View mWeatherContainerView;
 
     /**
