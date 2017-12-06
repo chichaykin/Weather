@@ -23,4 +23,6 @@ TODO:
 * Add layout for landscape mode to show more info for current weather.
 * Add support Fahrenheit
 * Add settings for temperature and pressure unit of measures
+* Add permissions handling.
 * Support release - add signing.
+![Screen 1](/images/screenshot.png)
