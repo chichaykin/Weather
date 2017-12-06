@@ -1,5 +1,8 @@
 # Weather
 
+
+![Screen 1](/images/screenshot.png)
+
 This sample projects demonstrates how to:
 
 * Show 5 days forecast. It uses openweathermap.org
@@ -25,4 +28,3 @@ TODO:
 * Add settings for temperature and pressure unit of measures
 * Add permissions handling.
 * Support release - add signing.
-![Screen 1](/images/screenshot.png)
