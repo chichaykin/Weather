@@ -1,12 +1,12 @@
 package com.mich.weather.services.api.location;
 
+import android.annotation.SuppressLint;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Looper;
-
 import rx.Observable;
 import rx.Subscriber;
 
@@ -28,18 +28,20 @@ public class LocationService {
 
     public Observable<Location> getLocation() {
         return Observable.create(new Observable.OnSubscribe<Location>() {
+            @SuppressLint("MissingPermission")
             @Override
             public void call(final Subscriber<? super Location> subscriber) {
                 if (mLocation != null) {
                     subscriber.onNext(mLocation);
-                    subscriber.onCompleted();
                 } else {
                     searchCurrentLocation(subscriber);
                 }
+                subscriber.onCompleted();
             }
         });
     }
 
+    @SuppressLint("MissingPermission")
     private void searchCurrentLocation(final Subscriber<? super Location> subscriber) {
         final LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(final Location location) {
